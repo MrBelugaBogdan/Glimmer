@@ -3,139 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Glimmer Platform | Alpha</title>
+    <title>Glimmer Engine & Studio</title>
     <style>
-        /* Основні стилі для гри */
-        body { 
-            margin: 0; 
-            overflow: hidden; 
-            background: #000; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            user-select: none;
+        :root {
+            --bg-dark: #0a0a0f;
+            --panel-bg: rgba(15, 15, 20, 0.95);
+            --accent: #00ffcc;
+            --border: #1e1e26;
+            --text: #e0e0e0;
         }
 
-        /* Інтерфейс (HUD) */
-        #ui { 
-            position: absolute; 
-            top: 20px; 
-            left: 20px; 
-            z-index: 10; 
-            color: white; 
-            pointer-events: none; 
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            overflow: hidden; background: var(--bg-dark);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text);
         }
 
-        .panel { 
-            background: rgba(0, 0, 0, 0.8); 
-            padding: 12px 20px; 
-            border: 1px solid #00ffcc; 
-            border-left: 5px solid #00ffcc;
-            margin-bottom: 10px; 
-            pointer-events: auto; 
-            min-width: 150px;
+        canvas { display: block; }
+
+        /* --- STUDIO INTERFACE --- */
+        #studio-ui {
+            display: none; /* Ховаємо при старті */
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            grid-template-columns: 250px 1fr 300px;
+            grid-template-rows: 40px 1fr 200px;
         }
 
-        .stats { font-size: 14px; color: #aaa; margin-bottom: 5px; }
-        .value { font-size: 18px; font-weight: bold; color: #fff; }
+        .studio-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            pointer-events: auto;
+            display: flex;
+            flex-direction: column;
+        }
 
-        /* Кнопки */
-        .btn { 
-            background: #00ffcc; 
-            border: none; 
-            padding: 10px 20px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            color: #000;
-            text-transform: uppercase;
-            transition: 0.2s;
+        .panel-header {
+            background: #16161e;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--accent);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Explorer (Ліворуч) */
+        #explorer { grid-column: 1; grid-row: 2 / 4; }
+        
+        /* Properties (Праворуч) */
+        #properties { grid-column: 3; grid-row: 2 / 4; }
+
+        /* Assets/Console (Низ) */
+        #bottom-bar { grid-column: 2; grid-row: 3; border-top: 2px solid var(--accent); }
+
+        /* Top Toolbar */
+        #toolbar {
+            grid-column: 1 / 4; grid-row: 1;
+            background: #111116;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            gap: 20px;
+            border-bottom: 1px solid var(--accent);
+        }
+
+        /* --- GAME UI (HUD) --- */
+        #game-hud {
+            position: absolute;
+            top: 20px; left: 20px;
+            pointer-events: none;
+        }
+
+        .hud-item {
+            background: rgba(0,0,0,0.7);
+            padding: 10px 15px;
+            border-left: 3px solid var(--accent);
+            margin-bottom: 5px;
             pointer-events: auto;
         }
-        .btn:hover { background: #fff; transform: scale(1.05); }
 
-        /* Вікно магазину */
-        #shop-modal { 
-            display: none; 
-            position: fixed; 
-            top: 50%; 
-            left: 50%; 
-            transform: translate(-50%, -50%); 
-            width: 350px; 
-            max-height: 80vh;
-            background: #111; 
-            color: white; 
-            padding: 25px; 
-            border: 2px solid #00ffcc; 
-            box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
-            z-index: 100;
-            overflow-y: auto;
+        /* --- BUTTONS & INPUTS --- */
+        .btn {
+            background: #252530;
+            border: 1px solid var(--border);
+            color: white;
+            padding: 5px 12px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .btn:hover { background: var(--accent); color: black; }
+        .btn.active { border-color: var(--accent); color: var(--accent); }
+
+        input, select, textarea {
+            background: #000;
+            border: 1px solid var(--border);
+            color: var(--accent);
+            padding: 3px;
+            font-family: monospace;
         }
 
-        #shop-items { margin: 20px 0; }
-        
-        .shop-header { 
-            border-bottom: 1px solid #333; 
-            padding-bottom: 10px; 
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        /* Стиль для елементів у списку магазину */
-        .item-row {
-            background: #222;
-            padding: 10px;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-radius: 4px;
+        /* Режим Auth (Реєстрація) */
+        #auth-screen {
+            position: fixed; inset: 0;
+            background: var(--bg-dark);
+            z-index: 9999;
+            display: flex; align-items: center; justify-content: center;
         }
     </style>
 </head>
 <body>
 
-    <div id="ui">
-        <div class="panel">
-            <div class="stats">ПЛАТФОРМА</div>
-            <div class="value">GLIMMER v0.4</div>
+    <div id="auth-screen">
+        <div style="text-align: center; border: 1px solid var(--accent); padding: 40px; background: #0f0f15;">
+            <h1 style="color: var(--accent); margin-top: 0;">GLIMMER STUDIO</h1>
+            <input type="text" id="nick-input" placeholder="Enter Nickname..." style="padding: 10px; width: 250px; font-size: 16px;">
+            <br><br>
+            <button class="btn" style="padding: 10px 30px; font-size: 14px;" onclick="window.launchGame()">LAUNCH</button>
         </div>
-        
-        <div class="panel">
-            <div class="stats">БАЛАНС</div>
-            <div class="value"><span id="coin-count">0</span> G-Coins</div>
-        </div>
-
-        <button class="btn" onclick="window.toggleShop()">Магазин</button>
     </div>
 
-    <div id="shop-modal">
-        <div class="shop-header">
-            <h2 style="margin:0; color:#00ffcc;">MARKET</h2>
-            <button onclick="window.toggleShop()" style="background:none; border:none; color:#555; cursor:pointer; font-size:20px;">✕</button>
+    <div id="game-hud">
+        <div class="hud-item">
+            <span style="color: #666; font-size: 10px;">PLAYER:</span><br>
+            <b id="display-name">Player</b>
         </div>
-        
-        <div id="shop-items">
-            <p style="color:#666; font-style:italic;">Завантаження товарів із заліза...</p>
+        <button class="btn" id="studio-toggle-btn" style="pointer-events: auto;">OPEN STUDIO</button>
+    </div>
+
+    <div id="studio-ui">
+        <div id="toolbar" class="studio-panel">
+            <span>Glimmer Editor v0.5</span>
+            <div style="display: flex; gap: 5px;">
+                <button class="btn" onclick="window.spawnPart()">+ PART</button>
+                <button class="btn">MODEL</button>
+                <button class="btn" style="color: #ff4444;">DELETE</button>
+            </div>
+            <div style="margin-left: auto;">
+                <button class="btn" onclick="window.toggleStudio()">CLOSE STUDIO</button>
+            </div>
         </div>
-        
-        <button class="btn" style="width:100%; background:#333; color:white;" onclick="window.toggleShop()">Закрити</button>
+
+        <div id="explorer" class="studio-panel">
+            <div class="panel-header">EXPLORER <span>Workspace</span></div>
+            <div id="explorer-content" style="padding: 10px; font-size: 13px;"></div>
+        </div>
+
+        <div id="properties" class="studio-panel">
+            <div class="panel-header">PROPERTIES</div>
+            <div id="properties-content" style="padding: 15px; font-size: 13px;">
+                <p style="color: #555;">Select an object to edit properties...</p>
+            </div>
+        </div>
+
+        <div id="bottom-bar" class="studio-panel">
+            <div class="panel-header">
+                <div>CONSOLE | ASSETS</div>
+                <button class="btn" style="font-size: 10px;">CLEAR</button>
+            </div>
+            <div id="console-output" style="padding: 10px; font-family: monospace; font-size: 12px; color: #888; overflow-y: auto;">
+                [System]: Glimmer Studio initialized...
+            </div>
+        </div>
     </div>
 
     <script type="importmap">
         { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
     </script>
-    
+
     <script type="module">
-        import { initShop } from './shop.js';
-        
-        // Функція для відкриття/закриття магазину
-        window.toggleShop = () => {
-            const modal = document.getElementById('shop-modal');
-            const isVisible = modal.style.display === 'block';
-            modal.style.display = isVisible ? 'none' : 'block';
+        import { GlimmerStudio } from './studio/main.js';
+
+        window.launchGame = () => {
+            const nick = document.getElementById('nick-input').value;
+            if(nick.length < 2) return alert("Nickname too short!");
+            
+            document.getElementById('display-name').innerText = nick;
+            document.getElementById('auth-screen').style.display = 'none';
+            
+            // Тут ми можемо ініціалізувати студію, коли гра завантажилась
+            window.studio = new GlimmerStudio();
         };
 
-        // Ми передамо посилання на гравця в магазин пізніше в engine.js
+        window.toggleStudio = () => {
+            const ui = document.getElementById('studio-ui');
+            const isVisible = ui.style.display === 'grid';
+            ui.style.display = isVisible ? 'none' : 'grid';
+            
+            // Повідомляємо двигун про зміну режиму
+            window.dispatchEvent(new CustomEvent('studioToggle', { detail: !isVisible }));
+        };
+
+        document.getElementById('studio-toggle-btn').onclick = window.toggleStudio;
     </script>
 
     <script type="module" src="engine.js"></script>
