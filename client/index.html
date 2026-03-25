@@ -2,31 +2,40 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Glimmer</title>
+    <title>Glimmer - Virtual World</title>
     <style>
-        body { margin: 0; overflow: hidden; font-family: sans-serif; }
-        #ui-layer { position: absolute; top: 10px; left: 10px; z-index: 10; }
-        .btn { background: #ff4400; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px; font-weight: bold; }
-        canvas { display: block; }
+        body { margin: 0; overflow: hidden; background: #000; font-family: 'Segoe UI', sans-serif; }
+        #gui { position: absolute; bottom: 20px; left: 20px; z-index: 10; display: flex; gap: 10px; }
+        .panel { background: rgba(0,0,0,0.7); color: white; padding: 15px; border-radius: 8px; border: 1px solid #333; }
+        .btn { background: #3a3a3a; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 4px; }
+        .btn:hover { background: #555; }
+        #shop-window { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                       width: 300px; background: #1a1a1a; border: 2px solid #00ffcc; color: white; padding: 20px; }
     </style>
 </head>
 <body>
-    <div id="ui-layer">
-        <button class="btn" onclick="openShop()">SHOP (МАГАЗИН)</button>
-        <div id="currency" style="color: white; margin-top: 5px;">Coins: 0</div>
+    <div id="gui">
+        <div class="panel">Coins: <span id="coin-count">0</span></div>
+        <button class="btn" onclick="openShop()">Магазин Glimmer</button>
+    </div>
+
+    <div id="shop-window" class="panel">
+        <h3>Glimmer Clothing Store</h3>
+        <div id="shop-items"></div>
+        <br>
+        <button class="btn" onclick="openShop()">Закрити</button>
     </div>
 
     <script type="importmap">
-        {
-            "imports": {
-                "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
-            }
-        }
+        { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
     </script>
     <script type="module" src="engine.js"></script>
+    <script type="module" src="shop.js"></script>
+
     <script>
         function openShop() {
-            alert("Магазин скоро відкриється! Виберіть свій унікальний скін.");
+            const win = document.getElementById('shop-window');
+            win.style.display = win.style.display === 'block' ? 'none' : 'block';
         }
     </script>
 </body>
