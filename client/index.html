@@ -2,24 +2,143 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Glimmer Platform</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glimmer Platform | Alpha</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #000; font-family: sans-serif; }
-        #ui { position: absolute; top: 20px; left: 20px; z-index: 10; color: white; pointer-events: none; }
-        .panel { background: rgba(0,0,0,0.7); padding: 10px; border: 1px solid #00ffcc; margin-bottom: 5px; pointer-events: auto; }
-        button { background: #00ffcc; border: none; padding: 5px 10px; cursor: pointer; font-weight: bold; }
+        /* Основні стилі для гри */
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            background: #000; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            user-select: none;
+        }
+
+        /* Інтерфейс (HUD) */
+        #ui { 
+            position: absolute; 
+            top: 20px; 
+            left: 20px; 
+            z-index: 10; 
+            color: white; 
+            pointer-events: none; 
+        }
+
+        .panel { 
+            background: rgba(0, 0, 0, 0.8); 
+            padding: 12px 20px; 
+            border: 1px solid #00ffcc; 
+            border-left: 5px solid #00ffcc;
+            margin-bottom: 10px; 
+            pointer-events: auto; 
+            min-width: 150px;
+        }
+
+        .stats { font-size: 14px; color: #aaa; margin-bottom: 5px; }
+        .value { font-size: 18px; font-weight: bold; color: #fff; }
+
+        /* Кнопки */
+        .btn { 
+            background: #00ffcc; 
+            border: none; 
+            padding: 10px 20px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            color: #000;
+            text-transform: uppercase;
+            transition: 0.2s;
+            pointer-events: auto;
+        }
+        .btn:hover { background: #fff; transform: scale(1.05); }
+
+        /* Вікно магазину */
+        #shop-modal { 
+            display: none; 
+            position: fixed; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            width: 350px; 
+            max-height: 80vh;
+            background: #111; 
+            color: white; 
+            padding: 25px; 
+            border: 2px solid #00ffcc; 
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
+            z-index: 100;
+            overflow-y: auto;
+        }
+
+        #shop-items { margin: 20px 0; }
+        
+        .shop-header { 
+            border-bottom: 1px solid #333; 
+            padding-bottom: 10px; 
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Стиль для елементів у списку магазину */
+        .item-row {
+            background: #222;
+            padding: 10px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
+
     <div id="ui">
-        <div class="panel">Glimmer Alpha v0.4</div>
-        <div class="panel">Coins: <span id="coin-count">0</span></div>
-        <button onclick="window.toggleShop()">МАГАЗИН</button>
+        <div class="panel">
+            <div class="stats">ПЛАТФОРМА</div>
+            <div class="value">GLIMMER v0.4</div>
+        </div>
+        
+        <div class="panel">
+            <div class="stats">БАЛАНС</div>
+            <div class="value"><span id="coin-count">0</span> G-Coins</div>
+        </div>
+
+        <button class="btn" onclick="window.toggleShop()">Магазин</button>
+    </div>
+
+    <div id="shop-modal">
+        <div class="shop-header">
+            <h2 style="margin:0; color:#00ffcc;">MARKET</h2>
+            <button onclick="window.toggleShop()" style="background:none; border:none; color:#555; cursor:pointer; font-size:20px;">✕</button>
+        </div>
+        
+        <div id="shop-items">
+            <p style="color:#666; font-style:italic;">Завантаження товарів із заліза...</p>
+        </div>
+        
+        <button class="btn" style="width:100%; background:#333; color:white;" onclick="window.toggleShop()">Закрити</button>
     </div>
 
     <script type="importmap">
         { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
     </script>
+    
+    <script type="module">
+        import { initShop } from './shop.js';
+        
+        // Функція для відкриття/закриття магазину
+        window.toggleShop = () => {
+            const modal = document.getElementById('shop-modal');
+            const isVisible = modal.style.display === 'block';
+            modal.style.display = isVisible ? 'none' : 'block';
+        };
+
+        // Ми передамо посилання на гравця в магазин пізніше в engine.js
+    </script>
+
     <script type="module" src="engine.js"></script>
+
 </body>
 </html>
